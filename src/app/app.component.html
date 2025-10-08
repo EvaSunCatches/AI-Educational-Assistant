@@ -1,0 +1,256 @@
+<main class="min-h-screen bg-slate-50 text-slate-800 p-4 sm:p-6 lg:p-8">
+  <div class="max-w-4xl mx-auto">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl sm:text-5xl font-bold text-slate-800">
+        AI Освітній Асистент <span class="text-sky-500">5-й Клас</span> 🇺🇦
+      </h1>
+      <p class="mt-2 text-lg text-slate-600">Ваш персональний помічник у навчанні</p>
+    </header>
+
+    <div class="grid grid-cols-1 gap-8">
+      <!-- Block 1: Input Card -->
+      <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col">
+        <div>
+          <h2 class="text-2xl font-bold mb-4 text-slate-700">Введіть ваше завдання</h2>
+
+          <!-- Subject Selector -->
+          <div class="mb-6">
+            <label for="subject-select" class="block text-sm font-medium text-slate-600 mb-2">Оберіть предмет</label>
+            <select id="subject-select"
+                    [ngModel]="subject()" 
+                    (ngModelChange)="setSubject($event)"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500">
+              <option value="Математика">Математика</option>
+              <option value="Українська мова та література">Українська мова та література</option>
+              <option value="Історія України">Історія України</option>
+            </select>
+          </div>
+
+          <!-- Input Mode Tabs -->
+          <div class="flex border-b border-slate-200 mb-4">
+            <button (click)="inputMode.set('url')" [class.border-sky-500]="inputMode() === 'url'" [class.text-sky-600]="inputMode() === 'url'" class="flex-1 py-2 font-semibold border-b-2 transition-colors">За посиланням</button>
+            <button (click)="inputMode.set('image')" [class.border-sky-500]="inputMode() === 'image'" [class.text-sky-600]="inputMode() === 'image'" class="flex-1 py-2 font-semibold border-b-2 transition-colors">Завантажити фото</button>
+          </div>
+
+          <!-- URL Input Form -->
+          @if (inputMode() === 'url') {
+            <div class="space-y-4">
+              <div>
+                <label for="url" class="block text-sm font-medium text-slate-600">URL підручника</label>
+                <input type="url" id="url" [ngModel]="url()" (ngModelChange)="url.set($event)" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition duration-200" placeholder="https://example.com/book">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="chapter" class="block text-sm font-medium text-slate-600">Розділ</label>
+                  <input type="text" id="chapter" [ngModel]="chapter()" (ngModelChange)="chapter.set($event)" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition duration-200" placeholder="§ 15">
+                </div>
+                <div>
+                  <label for="page" class="block text-sm font-medium text-slate-600">Сторінка</label>
+                  <input type="number" id="page" [ngModel]="page()" (ngModelChange)="page.set($event)" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition duration-200" placeholder="123">
+                </div>
+                <div>
+                  <label for="task" class="block text-sm font-medium text-slate-600">Завдання №</label>
+                  <input type="text" id="task" [ngModel]="task()" (ngModelChange)="task.set($event)" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition duration-200" placeholder="45, 47">
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Image Input Form -->
+          @if (inputMode() === 'image') {
+            <div class="space-y-4">
+              @if (isCameraOpen()) {
+                <!-- Camera View -->
+                <div class="relative bg-black rounded-lg overflow-hidden">
+                  <video #videoElement autoplay playsinline class="w-full h-auto"></video>
+                  <canvas #canvasElement class="hidden"></canvas>
+                  <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent flex justify-center">
+                    <button (click)="capturePhoto()" class="bg-white rounded-full h-16 w-16 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-white group">
+                      <div class="h-14 w-14 rounded-full border-4 border-slate-300 group-hover:border-white transition-colors bg-white"></div>
+                    </button>
+                  </div>
+                  <button (click)="closeCamera()" class="absolute right-4 top-4 bg-black/50 text-white font-semibold py-1 px-3 rounded-lg hover:bg-black/75 transition-colors">
+                    Скасувати
+                  </button>
+                </div>
+              } @else {
+                <!-- File Upload View -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-600 mb-2">Фото сторінки</label>
+                  <div 
+                    (dragover)="handleDragOver($event)" 
+                    (dragleave)="handleDragLeave($event)" 
+                    (drop)="handleDrop($event)"
+                    class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-md transition-colors"
+                    [class.border-sky-500]="isDragging()"
+                    [class.bg-sky-50]="isDragging()">
+                    <div class="space-y-1 text-center">
+                      <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <p class="text-sm text-slate-600">
+                        <span class="font-semibold text-sky-600">Перетягніть файл</span> або оберіть опцію
+                      </p>
+                      <div class="flex justify-center items-center space-x-4 pt-4">
+                        <button type="button" (click)="fileInput.click()" class="bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm leading-4 font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                          Обрати файл
+                        </button>
+                        <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+                        <button type="button" (click)="openCamera()" class="bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm leading-4 font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 flex items-center space-x-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 6a2 2 0 012-2h1.586a1 1 0 01.707.293l1.414 1.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l1.414-1.414A1 1 0 0114.414 4H16a2 2 0 012 2v8a2 2 0 01-2-2H4a2 2 0 01-2-2V6z" />
+                            <path fill-rule="evenodd" d="M10 14a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                          </svg>
+                          <span>Зробити фото</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (imagePreview() && !isCameraOpen()) {
+                <div class="mt-4">
+                  <p class="text-sm font-medium text-slate-600 mb-2">Попередній перегляд:</p>
+                  <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 relative">
+                    <img [src]="imagePreview()" alt="Попередній перегляд" class="max-h-60 w-auto mx-auto rounded">
+                    <button (click)="imagePreview.set(null); imageBase64.set(null)" class="absolute top-2 right-2 bg-white/75 rounded-full p-1 text-slate-600 hover:text-red-500 transition-colors" aria-label="Видалити зображення">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+                </div>
+              }
+              
+              <div>
+                <label for="task-from-image" class="block text-sm font-medium text-slate-600">Що потрібно зробити? (необов'язково)</label>
+                <input type="text" id="task-from-image" [ngModel]="taskFromImage()" (ngModelChange)="taskFromImage.set($event)" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition duration-200" placeholder="Наприклад, розв'яжи задачу №235">
+              </div>
+            </div>
+          }
+
+          <button (click)="getHelp()" [disabled]="isLoading()" class="mt-6 w-full bg-sky-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-sky-700 transition-transform transform hover:scale-105 duration-200 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center space-x-2">
+            @if (isLoading()) {
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Обробка...</span>
+            } @else {
+              <span>Отримати допомогу</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Block 2: Task Card -->
+      @if (taskStatement() || submittedImage()) {
+        <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+          <div class="flex justify-between items-center mb-4">
+             <h2 class="text-2xl font-bold text-slate-700">Умова завдання</h2>
+             @if(taskStatement()) {
+                <div class="flex items-center space-x-2">
+                    @if (speakingSection() === 'task' && (speechState() === 'playing' || speechState() === 'paused')) {
+                      <button (click)="togglePauseResume()" class="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-600" [attr.aria-label]="speechState() === 'playing' ? 'Пауза' : 'Продовжити'">
+                        @if (speechState() === 'playing') {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        } @else {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        }
+                      </button>
+                    }
+                    <button (click)="playOrStop('task')" [disabled]="isLoading()" class="p-2 rounded-full hover:bg-slate-100 transition-colors" [class.text-sky-500]="speakingSection() === 'task'" aria-label="Озвучити текст завдання">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+             }
+          </div>
+          @if(voiceError()) {
+            <div class="mb-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md" role="alert">
+                <p class="font-bold">Попередження</p>
+                <p>{{ voiceError() }}</p>
+            </div>
+          }
+          @if(submittedImage()) {
+             <div class="mb-4 border border-slate-200 rounded-lg p-2 bg-slate-50">
+                <img [src]="submittedImage()" alt="Надане зображення завдання" class="max-h-96 w-auto mx-auto rounded">
+             </div>
+          }
+          @if(taskStatement()) {
+              <div class="text-slate-700 prose prose-slate max-w-none text-lg leading-relaxed" [class.mt-4]="submittedImage()">
+                <p>
+                  @for(word of taskWords(); track $index; let isFirst = $first) {
+                    <span [class.bg-yellow-200]="highlightedTaskWordIndex() === $index" [class.rounded]="highlightedTaskWordIndex() === $index" class="transition-colors duration-100">{{(isFirst ? '' : ' ') + word.text}}</span>
+                  }
+                </p>
+              </div>
+          }
+        </div>
+      }
+
+      <!-- Block 3: Output Card -->
+      <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 flex flex-col">
+          <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-bold text-slate-700">Розв'язання та пояснення</h2>
+              @if(solution()) {
+                  <div class="flex items-center space-x-2">
+                    @if (speakingSection() === 'solution' && (speechState() === 'playing' || speechState() === 'paused')) {
+                      <button (click)="togglePauseResume()" class="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-600" [attr.aria-label]="speechState() === 'playing' ? 'Пауза' : 'Продовжити'">
+                        @if (speechState() === 'playing') {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        } @else {
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        }
+                      </button>
+                    }
+                    <button (click)="playOrStop('solution')" [disabled]="isLoading()" class="p-2 rounded-full hover:bg-slate-100 transition-colors" [class.text-sky-500]="speakingSection() === 'solution'" [attr.aria-label]="speakingSection() === 'solution' && speechState() !== 'stopped' ? 'Перейти до наступного речення' : 'Озвучити текст розв\'язання'">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      </svg>
+                    </button>
+                  </div>
+              }
+          </div>
+          
+          @if (geminiError()) {
+              <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
+                  <p class="font-bold">Помилка</p>
+                  <p>{{ geminiError() }}</p>
+              </div>
+          }
+
+          <div #solutionContainer class="flex-grow prose prose-slate max-w-none prose-p:my-2 prose-headings:my-3 prose-li:my-1 overflow-y-auto pr-2">
+            @if (isLoading()) {
+              <div class="flex flex-col items-center justify-center h-full text-slate-500">
+                  <p class="text-lg font-semibold mb-2">AI думає над вашим завданням...</p>
+                  <div class="w-full bg-slate-200 rounded-full h-2.5 mb-2">
+                      <div class="bg-sky-500 h-2.5 rounded-full transition-all duration-300 ease-linear" [style.width.%]="loadingProgress()"></div>
+                  </div>
+                  <p class="text-sm font-medium text-slate-600 mb-4">Завершено: {{ Math.round(loadingProgress()) }}%</p>
+              </div>
+            } @else if (solution()) {
+               <div [innerHTML]="solution()"></div>
+            } @else {
+               <div class="flex flex-col items-center justify-center h-full text-slate-400 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  <p class="text-lg font-semibold">Тут з'явиться відповідь</p>
+                  <p>Заповніть форму ліворуч, щоб почати</p>
+              </div>
+            }
+          </div>
+          
+          @if (solution()) {
+              <app-chat-panel 
+                  [chatHistory]="chatHistory()" 
+                  [isGenerating]="isChatting()"
+                  (messageSent)="handleUserMessage($event)"
+                  />
+          }
+        </div>
+
+    </div>
+  </div>
+</main>

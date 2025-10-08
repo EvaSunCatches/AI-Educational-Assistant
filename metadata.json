@@ -1,0 +1,8 @@
+{
+  "name": "AI Educational Assistant for 5th Grade (Ukrainian Curriculum)",
+  "description": "An AI-powered homework helper and self-study tool for a 5th-grade student following the Ukrainian educational curriculum. It provides step-by-step solutions for math, Ukrainian language, and history tasks, with voice interaction.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
