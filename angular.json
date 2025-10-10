@@ -12,11 +12,17 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "assets": [
+              "src/assets"
+            ],
             "outputPath": {
               "base": "./dist",
               "browser": "."
             },
             "browser": "index.tsx",
+            "styles": [
+              "src/styles.css"
+            ],
             "tsConfig": "tsconfig.json"
           },
           "configurations": {
@@ -45,8 +51,23 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              ".//**/*.ts",
+              ".//**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "22a3e472-3f5a-43cc-a9eb-f649d70fc75e",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }
