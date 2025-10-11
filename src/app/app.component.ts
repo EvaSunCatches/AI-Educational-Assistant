@@ -1,32 +1,25 @@
 import { Component } from '@angular/core';
-import { GeminiService } from './gemini.service';
+import { RouterOutlet } from '@angular/router';
+import { ChatPanelComponent } from './components/chat-panel/chat-panel.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, ChatPanelComponent],
+  template: `
+    <header style="background:linear-gradient(90deg,#93c5fd,#fde68a);padding:14px;color:#042c58">
+      <div style="max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:12px">
+        <img src="assets/avatar.png" alt="avatar" style="width:54px;height:54px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
+        <div>
+          <div style="font-weight:600">AI Помічник — 5-й клас</div>
+          <div style="font-size:0.85rem;opacity:0.85">Пояснення українською мовою</div>
+        </div>
+      </div>
+    </header>
+    <main style="padding:20px">
+      <app-chat-panel></app-chat-panel>
+    </main>
+  `
 })
-export class AppComponent {
-  title = 'AI Освітній Асистент';
-  currentSubject = 'Математика';
-  reply: string = '';
-
-  constructor(private geminiService: GeminiService) {}
-
-  async askQuestion() {
-    const text = prompt('Введи своє запитання 👇');
-    if (!text) return;
-    this.reply = '⏳ Зачекай, думаю...';
-    this.reply = await this.geminiService.askQuestion(this.currentSubject, text);
-  }
-
-  async solveFromUrl() {
-    this.reply = '🔗 Обробляю посилання...';
-    this.reply = await this.geminiService.solveFromUrl(this.currentSubject);
-  }
-
-  async solveFromImage() {
-    this.reply = '🖼️ Аналізую зображення...';
-    this.reply = await this.geminiService.solveFromImage(this.currentSubject); 
-  }
-}
+export class AppComponent {}

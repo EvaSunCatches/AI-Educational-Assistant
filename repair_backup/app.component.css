@@ -1,0 +1,113 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #e8f6ff, #fff9e6);
+  height: 100%;
+  color: #1a1a1a;
+}
+
+.container {
+  text-align: center;
+  padding: 50px 20px;
+  animation: fadeIn 1.2s ease;
+}
+
+h1 {
+  font-size: 2.4rem;
+  color: #007acc;
+  text-shadow: 2px 2px 8px rgba(0, 122, 204, 0.3);
+  margin-bottom: 25px;
+}
+
+h3 {
+  margin-bottom: 25px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 14px 30px;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  transition: all 0.25s ease;
+  font-weight: 600;
+}
+
+.btn span {
+  letter-spacing: 0.5px;
+}
+
+.btn.blue {
+  background: linear-gradient(145deg, #00b4ff, #007acc);
+}
+
+.btn.yellow {
+  background: linear-gradient(145deg, #ffd500, #ffbb00);
+  color: #333;
+}
+
+.btn.purple {
+  background: linear-gradient(145deg, #a855f7, #7c3aed);
+}
+
+.btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.output {
+  margin-top: 40px;
+  background: #ffffffd9;
+  border-radius: 15px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  padding: 25px;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 700px;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.8s ease;
+}
+
+.output h3 {
+  color: #007acc;
+  margin-bottom: 15px;
+}
+
+pre {
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
