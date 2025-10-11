@@ -1,39 +1,39 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { GeminiService } from '../../services/gemini.service';
 
 @Component({
   selector: 'app-chat-panel',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="chat-panel">
-      <h2>💬 AI Освітній Помічник</h2>
-      <textarea
-        placeholder="Введіть своє запитання..."
-        [(ngModel)]="question"
-      ></textarea>
-      <button (click)="sendQuestion()">Надіслати</button>
-
-      <div class="reply" *ngIf="reply()">
-        <strong>AI:</strong> {{ reply() }}
-      </div>
-    </div>
-  `,
-  styles: [`
-    .chat-panel { background:#f8fafc; padding:20px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-    textarea { width:100%; height:100px; border-radius:8px; padding:10px; border:1px solid #cbd5e1; }
-    button { background:#2563eb; color:#fff; border:none; border-radius:6px; padding:8px 14px; cursor:pointer; margin-top:10px; }
-    .reply { margin-top:16px; background:white; border-left:4px solid #2563eb; padding:12px; border-radius:8px; }
-  `]
+  template: \`
+  <div class="chat-card">
+    <h2>💬 AI Помічник</h2>
+    <textarea [(ngModel)]="question" placeholder="Введіть своє запитання..." class="input"></textarea>
+    <button (click)="sendQuestion()">Надіслати</button>
+    <div *ngIf="reply()" class="reply">{{ reply() }}</div>
+  </div>
+  \`,
+  styles: [\`
+    .chat-card { max-width:600px; margin:40px auto; background:#f0f8ff; border-radius:12px; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    textarea.input { width:100%; height:120px; padding:10px; border-radius:8px; border:1px solid #ccc; margin-bottom:10px; }
+    button { background:#0078d7; color:#fff; border:none; border-radius:6px; padding:10px 20px; cursor:pointer; }
+    button:hover { background:#005fa3; }
+    .reply { margin-top:16px; background:#fff; padding:12px; border-left:4px solid #0078d7; border-radius:8px; white-space:pre-line; }
+  \`]
 })
 export class ChatPanelComponent {
   question = signal<string>('');
   reply = signal<string>('');
 
-  sendQuestion() {
+  constructor(private gemini: GeminiService) {}
+
+  async sendQuestion() {
     const q = this.question().trim();
     if (!q) return;
-    this.reply.set(`Ти запитав: "${q}" — зараз поясню!`);
+    this.reply.set('🔄 Обробка запиту...');
+    const res = await this.gemini.askGemini(q);
+    this.reply.set(res);
   }
 }
